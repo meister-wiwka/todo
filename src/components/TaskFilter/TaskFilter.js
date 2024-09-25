@@ -1,19 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
+import { filters } from './filterConstants';
+
 import './TaskFilter.css';
 
 export default class TaskFilter extends Component {
-  buttons = [
-    { name: 'all', label: 'All' },
-    { name: 'active', label: 'Active' },
-    { name: 'completed', label: 'Completed' },
-  ];
-
   render() {
     const { filter, onFilterChange } = this.props;
 
-    const buttons = this.buttons.map(({ name, label }) => {
+    const buttons = filters.map(({ name, label }) => {
       const isSelected = filter === name;
       const buttonClass = isSelected ? 'selected' : '';
       return (

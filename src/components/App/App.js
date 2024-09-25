@@ -4,10 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 import Header from '../Header';
 import TaskList from '../TaskList';
 import Footer from '../Footer';
-import './TodoApp.css';
+import './App.css';
 
-export default class TodoApp extends Component {
-  static createTodoItem(description) {
+export default class App extends Component {
+  createTodoItem(description) {
+    if (description.trim() === '') {
+      return null;
+    }
+
     const task = {
       id: uuidv4(),
       description,
@@ -54,15 +58,17 @@ export default class TodoApp extends Component {
   };
 
   addItem = (description) => {
-    const newItem = TodoApp.createTodoItem(description);
+    const newItem = this.createTodoItem(description);
 
-    this.setState(({ data }) => {
-      const newData = [newItem, ...data];
+    if (newItem) {
+      this.setState(({ data }) => {
+        const newData = [newItem, ...data];
 
-      return {
-        data: newData,
-      };
-    });
+        return {
+          data: newData,
+        };
+      });
+    }
   };
 
   editItem = (id, description) => {
@@ -92,9 +98,11 @@ export default class TodoApp extends Component {
   };
 
   onClearCompleted = () => {
-    const { data } = this.state;
-    const completedCount = data.filter((elem) => elem.completed);
-    completedCount.forEach((elem) => this.deleteItem(elem.id));
+    this.setState(({ data }) => {
+      return {
+        data: data.filter((elem) => !elem.completed),
+      };
+    });
   };
 
   onFilterChange = (filter) => {
