@@ -6,13 +6,7 @@ import './TaskList.css';
 
 function TaskList({ tasks, onDeleted, onToggleCompleted, onEdited }) {
   const tasksList = tasks.map((elem) => (
-    <Task
-      key={elem.id}
-      task={elem}
-      onDeleted={() => onDeleted(elem.id)}
-      onToggleCompleted={() => onToggleCompleted(elem.id)}
-      onEdited={onEdited}
-    />
+    <Task key={elem.id} task={elem} onDeleted={onDeleted} onToggleCompleted={onToggleCompleted} onEdited={onEdited} />
   ));
 
   return <ul className="todo-list">{tasksList}</ul>;

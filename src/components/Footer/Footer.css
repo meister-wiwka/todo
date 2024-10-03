@@ -28,6 +28,7 @@
 
 .todo-count {
 	text-align: left;
+	font-weight: 300;
 }
 
 .clear-completed,

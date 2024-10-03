@@ -104,14 +104,6 @@ body {
 	padding: 10px 27px 10px 27px;
 }
 
-.toggle-all:checked + label:before {
-	color: #737373;
-}
-
-.todo-count strong {
-	font-weight: 300;
-}
-
 .info {
 	margin: 65px auto 0;
 	color: #4d4d4d;
@@ -132,14 +124,4 @@ body {
 
 .info a:hover {
 	text-decoration: underline;
-}
-
-/*
-	Hack to remove background from Mobile Safari.
-	Can't use it globally since it destroys checkboxes in Firefox
-*/
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-	.toggle-all {
-		background: none;
-	}
 }

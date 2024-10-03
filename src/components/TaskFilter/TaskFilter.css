@@ -1,13 +1,9 @@
-.filters {
+.filters li button.selected {
 	margin: 0;
 	padding: 0;
 	list-style: none;
 	right: 0;
 	left: 0;
-}
-
-.filters li button.selected {
-	border-color: rgba(175, 47, 47, 0.2);
 }
 
 .filters li {
@@ -31,6 +27,10 @@
 
 .filters li:hover button {
 	border-color: rgba(175, 47, 47, 0.1);
+}
+
+.filters li button.selected {
+	border-color: rgba(175, 47, 47, 0.2);
 }
 
 @media (max-width: 430px) {

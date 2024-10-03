@@ -3,6 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 import PropTypes from 'prop-types';
 
 import './Task.css';
+import TaskTimer from '../TaskTimer/TaskTimer';
 
 export default class Task extends Component {
   state = {
@@ -31,7 +32,7 @@ export default class Task extends Component {
 
     event.preventDefault();
     if (description !== task.description) {
-      onEdited(task.id, description);
+      onEdited(task.id, { description: description });
     }
     this.setState({
       edit: false,
@@ -39,10 +40,9 @@ export default class Task extends Component {
   };
 
   render() {
-    const { task, onDeleted, onToggleCompleted } = this.props;
+    const { task, onDeleted, onToggleCompleted, onEdited } = this.props;
     const { edit, description } = this.state;
     let classNames = '';
-    let isChecked = false;
 
     const editForm = (
       <form onSubmit={this.onSubmit}>
@@ -52,7 +52,6 @@ export default class Task extends Component {
 
     if (task.completed) {
       classNames = 'completed';
-      isChecked = true;
     }
     if (edit) {
       classNames = 'editing';
@@ -64,15 +63,16 @@ export default class Task extends Component {
             className="toggle"
             type="checkbox"
             id={task.id}
-            onClick={onToggleCompleted}
-            defaultChecked={isChecked}
+            onClick={() => onToggleCompleted(task.id)}
+            defaultChecked={task.completed}
           />
           <label htmlFor={task.id}>
-            <span className="description">{task.description}</span>
-            <span className="created">{formatDistanceToNow(task.created)}</span>
+            <span className="title">{task.description}</span>
+            <TaskTimer timeLeft={task.timeLeft} id={task.id} isChecked={task.completed} onEdit={onEdited} />
+            <span className="description">{formatDistanceToNow(task.created)}</span>
           </label>
           <button type="button" className="icon icon-edit" onClick={this.onEditClick} />
-          <button type="button" className="icon icon-destroy" onClick={onDeleted} />
+          <button type="button" className="icon icon-destroy" onClick={() => onDeleted(task.id)} />
         </div>
         {edit ? editForm : null}
       </li>

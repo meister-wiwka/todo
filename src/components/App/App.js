@@ -7,14 +7,11 @@ import Footer from '../Footer';
 import './App.css';
 
 export default class App extends Component {
-  createTodoItem(description) {
-    if (description.trim() === '') {
-      return null;
-    }
-
+  static createTodoItem(description, timeLeft) {
     const task = {
       id: uuidv4(),
       description,
+      timeLeft,
       created: new Date(),
       completed: false,
     };
@@ -27,18 +24,21 @@ export default class App extends Component {
       {
         id: uuidv4(),
         description: 'learn react',
+        timeLeft: 123,
         created: new Date(),
         completed: false,
       },
       {
         id: uuidv4(),
         description: 'practice react',
+        timeLeft: 456,
         created: new Date(),
         completed: false,
       },
       {
         id: uuidv4(),
         description: 'relax',
+        timeLeft: 789,
         created: new Date(),
         completed: false,
       },
@@ -48,8 +48,7 @@ export default class App extends Component {
 
   deleteItem = (id) => {
     this.setState(({ data }) => {
-      const index = data.findIndex((elem) => elem.id === id);
-      const newData = [...data.slice(0, index), ...data.slice(index + 1)];
+      const newData = data.filter((elem) => elem.id !== id);
 
       return {
         data: newData,
@@ -57,31 +56,33 @@ export default class App extends Component {
     });
   };
 
-  addItem = (description) => {
-    const newItem = this.createTodoItem(description);
+  addItem = (description, timeLeft) => {
+    const newItem = App.createTodoItem(description, timeLeft);
 
-    if (newItem) {
+    this.setState(({ data }) => {
+      const newData = [newItem, ...data];
+
+      return {
+        data: newData,
+      };
+    });
+  };
+
+  editItem = (id, editValue) => {
+    const { data } = this.state;
+    const index = data.findIndex((elem) => elem.id === id);
+    if (index >= 0) {
       this.setState(({ data }) => {
-        const newData = [newItem, ...data];
+        const index = data.findIndex((elem) => elem.id === id);
+        const oldItem = data[index];
+        const newItem = { ...oldItem, ...editValue };
+        const newData = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
 
         return {
           data: newData,
         };
       });
     }
-  };
-
-  editItem = (id, description) => {
-    this.setState(({ data }) => {
-      const index = data.findIndex((elem) => elem.id === id);
-      const oldItem = data[index];
-      const newItem = { ...oldItem, description };
-      const newData = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
-
-      return {
-        data: newData,
-      };
-    });
   };
 
   onToggleCompleted = (id) => {
@@ -98,11 +99,9 @@ export default class App extends Component {
   };
 
   onClearCompleted = () => {
-    this.setState(({ data }) => {
-      return {
-        data: data.filter((elem) => !elem.completed),
-      };
-    });
+    const { data } = this.state;
+    const completedCount = data.filter((elem) => elem.completed);
+    completedCount.forEach((elem) => this.deleteItem(elem.id));
   };
 
   onFilterChange = (filter) => {
