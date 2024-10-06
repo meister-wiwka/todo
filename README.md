@@ -1,3 +1,3 @@
 # todos app
 
-https://todo-git-todo-timer-wiwkas-projects.vercel.app/
+https://todo-git-hooks-wiwkas-projects.vercel.app/
