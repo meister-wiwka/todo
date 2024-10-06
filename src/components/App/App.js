@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import Header from '../Header';
@@ -6,145 +6,119 @@ import TaskList from '../TaskList';
 import Footer from '../Footer';
 import './App.css';
 
-export default class App extends Component {
-  static createTodoItem(description, timeLeft) {
-    const task = {
+const initialData = [
+  {
+    id: uuidv4(),
+    description: 'learn react',
+    timeLeft: 3,
+    created: new Date(),
+    completed: false,
+  },
+  {
+    id: uuidv4(),
+    description: 'practice react',
+    timeLeft: 3,
+    created: new Date(),
+    completed: false,
+  },
+  {
+    id: uuidv4(),
+    description: 'relax',
+    timeLeft: 3,
+    created: new Date(),
+    completed: false,
+  },
+];
+
+const App = () => {
+  const [todos, setTodos] = useState(initialData);
+  const [filter, setFilter] = useState('all');
+
+  const createTask = (description, timeLeft) => {
+    return {
       id: uuidv4(),
       description,
       timeLeft,
       created: new Date(),
       completed: false,
     };
-
-    return task;
-  }
-
-  state = {
-    data: [
-      {
-        id: uuidv4(),
-        description: 'learn react',
-        timeLeft: 123,
-        created: new Date(),
-        completed: false,
-      },
-      {
-        id: uuidv4(),
-        description: 'practice react',
-        timeLeft: 456,
-        created: new Date(),
-        completed: false,
-      },
-      {
-        id: uuidv4(),
-        description: 'relax',
-        timeLeft: 789,
-        created: new Date(),
-        completed: false,
-      },
-    ],
-    filter: 'all',
   };
 
-  deleteItem = (id) => {
-    this.setState(({ data }) => {
-      const newData = data.filter((elem) => elem.id !== id);
+  const addTask = (description, timeLeft) => {
+    const newTask = createTask(description, timeLeft);
+    setTodos([...todos, newTask]);
+  };
 
-      return {
-        data: newData,
-      };
+  const deleteTask = (id) => {
+    setTodos((todos) => {
+      const newTodos = todos.filter((task) => task.id !== id);
+      return newTodos;
     });
   };
 
-  addItem = (description, timeLeft) => {
-    const newItem = App.createTodoItem(description, timeLeft);
-
-    this.setState(({ data }) => {
-      const newData = [newItem, ...data];
-
-      return {
-        data: newData,
-      };
-    });
-  };
-
-  editItem = (id, editValue) => {
-    const { data } = this.state;
-    const index = data.findIndex((elem) => elem.id === id);
-    if (index >= 0) {
-      this.setState(({ data }) => {
-        const index = data.findIndex((elem) => elem.id === id);
-        const oldItem = data[index];
-        const newItem = { ...oldItem, ...editValue };
-        const newData = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
-
-        return {
-          data: newData,
-        };
+  const editTask = (id, editValue) => {
+    setTodos((todos) => {
+      const newTodos = todos.map((task) => {
+        if (task.id === id) {
+          return { ...task, ...editValue };
+        }
+        return task;
       });
-    }
-  };
-
-  onToggleCompleted = (id) => {
-    this.setState(({ data }) => {
-      const index = data.findIndex((elem) => elem.id === id);
-      const oldItem = data[index];
-      const newItem = { ...oldItem, completed: !oldItem.completed };
-      const newData = [...data.slice(0, index), newItem, ...data.slice(index + 1)];
-
-      return {
-        data: newData,
-      };
+      return newTodos;
     });
   };
 
-  onClearCompleted = () => {
-    const { data } = this.state;
-    const completedCount = data.filter((elem) => elem.completed);
-    completedCount.forEach((elem) => this.deleteItem(elem.id));
+  const onToggleCompleted = (id) => {
+    const newTodos = todos.map((task) => {
+      if (task.id === id) {
+        task.completed = !task.completed;
+      }
+
+      return task;
+    });
+    setTodos(newTodos);
   };
 
-  onFilterChange = (filter) => {
-    this.setState({ filter });
+  const onClearCompleted = () => {
+    const needDelete = todos.filter((task) => task.completed);
+    needDelete.forEach((task) => deleteTask(task.id));
   };
 
-  myFilter(filter) {
-    const { data } = this.state;
+  const onFilterChange = (value) => {
+    setFilter(value);
+  };
 
-    switch (filter) {
+  const myFilter = (value) => {
+    switch (value) {
       case 'active':
-        return data.filter((elem) => !elem.completed);
+        return todos.filter((elem) => !elem.completed);
       case 'completed':
-        return data.filter((elem) => elem.completed);
+        return todos.filter((elem) => elem.completed);
       case 'all':
       default:
-        return data;
+        return todos;
     }
-  }
+  };
 
-  render() {
-    const { data, filter } = this.state;
-    const nonCompletedCount = data.filter((elem) => !elem.completed).length;
-    const filteredData = this.myFilter(filter);
-
-    return (
-      <section className="todoapp">
-        <Header onTaskAdded={this.addItem} />
-        <section className="main">
-          <TaskList
-            tasks={filteredData}
-            onDeleted={this.deleteItem}
-            onToggleCompleted={this.onToggleCompleted}
-            onEdited={this.editItem}
-          />
-          <Footer
-            left={nonCompletedCount}
-            onClearCompleted={this.onClearCompleted}
-            filter={filter}
-            onFilterChange={this.onFilterChange}
-          />
-        </section>
+  return (
+    <section className="todoapp">
+      <Header onTaskAdded={addTask} />
+      <section className="main">
+        <TaskList
+          tasks={myFilter(filter)}
+          onTaskDeleted={deleteTask}
+          onToggleCompleted={onToggleCompleted}
+          onTaskEdited={editTask}
+        />
+        <Footer
+          tasksLeft={todos.filter((task) => !task.completed).length}
+          onClearCompleted={onClearCompleted}
+          filterValue={filter}
+          onFilterChange={onFilterChange}
+        />
       </section>
-    );
-  }
-}
+    </section>
+  );
+};
+
+export default App;
