@@ -45,43 +45,28 @@ const App = () => {
   };
 
   const addTask = (description, timeLeft) => {
-    const newTask = createTask(description, timeLeft);
-    setTodos([...todos, newTask]);
+    setTodos((currentTodos) => {
+      const newTask = createTask(description, timeLeft);
+      return [...currentTodos, newTask];
+    });
   };
 
   const deleteTask = (id) => {
-    setTodos((todos) => {
-      const newTodos = todos.filter((task) => task.id !== id);
-      return newTodos;
-    });
+    setTodos((currentTodos) => currentTodos.filter((task) => task.id !== id));
   };
 
   const editTask = (id, editValue) => {
-    setTodos((todos) => {
-      const newTodos = todos.map((task) => {
-        if (task.id === id) {
-          return { ...task, ...editValue };
-        }
-        return task;
-      });
-      return newTodos;
-    });
+    setTodos((currentTodos) => currentTodos.map((task) => (task.id === id ? { ...task, ...editValue } : task)));
   };
 
   const onToggleCompleted = (id) => {
-    const newTodos = todos.map((task) => {
-      if (task.id === id) {
-        task.completed = !task.completed;
-      }
-
-      return task;
-    });
-    setTodos(newTodos);
+    setTodos((currentTodos) =>
+      currentTodos.map((task) => (task.id === id ? { ...task, completed: !task.completed } : task))
+    );
   };
 
   const onClearCompleted = () => {
-    const needDelete = todos.filter((task) => task.completed);
-    needDelete.forEach((task) => deleteTask(task.id));
+    setTodos((currentTodos) => currentTodos.filter((task) => !task.completed));
   };
 
   const onFilterChange = (value) => {
